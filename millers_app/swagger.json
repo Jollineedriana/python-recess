@@ -1,0 +1,630 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Authors App API",
+    "description": "API endpoints for managing users, books, and companies in the Authors App",
+    "version": "1.0"
+  },
+  "basePath": "/api/v1",
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Endpoints for user authentication and management"
+    },
+    {
+      "name": "book",
+      "description": "Endpoints for managing books"
+    },
+    {
+      "name": "company",
+      "description": "Endpoints for managing companies"
+    }
+  ],
+  "schemes": ["http"],
+  "securityDefinitions": {
+    "JWT": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "JWT": []
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Register a new user",
+        "description": "Register a new user with their personal information.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserRegistration"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User successfully registered",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "409": {
+            "description": "Conflict - Email or contact already exists"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "User login",
+        "description": "Authenticate user credentials and generate access token.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User credentials",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserLogin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "access_token": {
+                  "type": "string"
+                },
+                "user_id": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid email or password"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/auth/edit/{user_id}": {
+      "put": {
+        "tags": ["auth"],
+        "summary": "Edit user details",
+        "description": "Edit details of a user.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "description": "User ID",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserEdit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Forbidden - Unauthorized access"
+          },
+          "404": {
+            "description": "Not found - User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/auth/delete/{user_id}": {
+      "delete": {
+        "tags": ["auth"],
+        "summary": "Delete user",
+        "description": "Delete a user by their ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "description": "User ID",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully"
+          },
+          "404": {
+            "description": "Not found - User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/auth/user/{user_id}": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Get user details",
+        "description": "Get details of a user by their ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "description": "User ID",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          },
+          "404": {
+            "description": "Not found - User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/auth/users": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Get all users",
+        "description": "Get details of all users.",
+        "responses": {
+          "200": {
+            "description": "List of users",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/UserResponse"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/book/register": {
+      "post": {
+        "tags": ["book"],
+        "summary": "Register a new book",
+        "description": "Register a new book.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Book data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BookRegistration"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Book successfully registered"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/book/book/{id}": {
+      "get": {
+        "tags": ["book"],
+        "summary": "Get a specific book",
+        "description": "Get details of a specific book by its ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Book ID",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Book details"
+          },
+          "404": {
+            "description": "Not found - Book not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/book/delete/{id}": {
+      "delete": {
+        "tags": ["book"],
+        "summary": "Delete a book",
+        "description": "Delete a book by its ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Book ID",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Book deleted successfully"
+          },
+          "404": {
+            "description": "Not found - Book not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/book/edit/{id}": {
+      "put": {
+        "tags": ["book"],
+        "summary": "Edit a book",
+        "description": "Edit details of a book by its ID.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Book ID",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Book data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BookRegistration"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Book updated successfully"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Forbidden - Unauthorized access"
+          },
+          "404": {
+            "description": "Not found - Book not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/book/books": {
+      "get": {
+        "tags": ["book"],
+        "summary": "Get all books",
+        "description": "Get details of all books.",
+        "responses": {
+          "200": {
+            "description": "List of books"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/company/create": {
+      "post": {
+        "tags": ["company"],
+        "summary": "Create a new company",
+        "description": "Create a new company.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Company data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CompanyRegistration"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Company successfully created"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found - User not found"
+          },
+          "409": {
+            "description": "Conflict - Company name already exists"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/company/delete/{id}": {
+      "delete": {
+        "tags": ["company"],
+        "summary": "Delete a company",
+        "description": "Delete a company by its ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Company ID",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company deleted successfully"
+          },
+          "404": {
+            "description": "Not found - Company not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/company/edit/{id}": {
+      "put": {
+        "tags": ["company"],
+        "summary": "Edit a company",
+        "description": "Edit details of a company by its ID.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Company ID",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Company data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CompanyRegistration"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company updated successfully"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Forbidden - Unauthorized access"
+          },
+          "404": {
+            "description": "Not found - Company not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/company/company/{id}": {
+      "get": {
+        "tags": ["company"],
+        "summary": "Get a specific company",
+        "description": "Get details of a specific company by its ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Company ID",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company details"
+          },
+          "404": {
+            "description": "Not found - Company not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/company/companies": {
+      "get": {
+        "tags": ["company"],
+        "summary": "Get all companies",
+        "description": "Get details of all companies.",
+        "responses": {
+          "200": {
+            "description": "List of companies"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "UserRegistration": {
+      "type": "object",
+      "properties": {
+        "first_name": {
+          "type": "string",
+          "example": "John"
+        },
+        "last_name": {
+          "type": "string",
+          "example": "Doe"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "example": "john@example.com"
+        },
+        "contact": {
+          "type": "string",
+          "example": "+1234567890"
+        },
+        "password": {
+          "type": "string",
+          "example": "password123"
+        },
+        "biography": {
+          "type": "string",
+          "example": "A short biography."
+        },
+        "user_type": {
+          "type": "string",
+          "enum": ["author", "reader"],
+          "example": "author"
+        }
+      }
+    },
+    "BookRegistration": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Book Title"
+        },
+        "description": {
+          "type": "string",
+          "example": "Book description."
+        },
+        "price": {
+          "type": "number",
+          "format": "float",
+          "example": 10.99
+        },
+        "pages": {
+          "type": "integer",
+          "example": 300
+        },
+        "publication_date": {
+          "type": "string",
+          "format": "date",
+          "example": "2023-04-01"
+        },
+        "isbn": {
+          "type": "string",
+          "example": "978-3-16-148410-0"
+        },
+        "genre": {
+          "type": "string",
+          "example": "fiction"
+        },
+        "company_id": {
+          "type": "integer",
+          "example": 1
+        }
+      }
+    },
+    "CompanyRegistration": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Company Name"
+        },
+        "origin": {
+          "type": "string",
+          "example": "Company Origin"
+        },
+        "description": {
+          "type": "string",
+          "example": "Company description."
+        },
+        "user_id": {
+          "type": "integer",
+          "example": 1
+        }
+      }
+    }
+  }
+}
